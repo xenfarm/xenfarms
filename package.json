@@ -1,0 +1,26 @@
+{
+  "name": "xenfarms",
+  "version": "1.0.0",
+  "bugs": {
+    "url": "https://github.com/xenfarm/xenfarms/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xenfarm/xenfarms/.git"
+  },
+  "license": "MIT",
+  "scripts": {
+    "ci": "env CI=true",
+    "compile": "hardhat compile",
+    "format": "prettier --write '**/*.{sol,js,json,md}'",
+    "sort": "npx sort-package-json",
+    "test": "hardhat test"
+  },
+  "devDependencies": {
+    "dotenv": "16.0.3",
+    "hardhat": "2.11.2",
+    "prettier": "2.7.1",
+    "@openzeppelin/contracts": "3.4.2",
+    "prettier-plugin-solidity": "1.0.0-beta.24"
+  }
+}
