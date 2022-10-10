@@ -1,5 +1,6 @@
 require("dotenv").config();
 require("@nomiclabs/hardhat-waffle");
+require("hardhat-gas-reporter");
 
 module.exports = {
   defaultNetwork: "hardhat",
@@ -12,6 +13,12 @@ module.exports = {
   },
   etherscan: {
     apiKey: process.env.ETHERSCAN_API,
+  },
+  gasReporter: {
+    token: "ETH",
+    currency: "USD",
+    outputFile: "gas-report.txt",
+    coinmarketcap: process.env.COINMARKETCAP_API_KEY,
   },
   solidity: {
     compilers: [

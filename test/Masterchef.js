@@ -1,14 +1,16 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
 const UniswapV2Router02Artifact = require("@uniswap/v2-periphery/build/UniswapV2Router02.json");
+const UniswapV2FactoryArtifact = require("@uniswap/v2-core/build/UniswapV2Factory.json");
 
-describe("Burner", () => {
+describe("Masterchef", () => {
   before(async () => {
     const [owner] = await ethers.getSigners();
 
     this.owner = owner;
 
     const unirouter = "0x7a250d5630b4cf539739df2c5dacb4c659f2488d";
+    const unifactory = "0x5c69bee701ef814a2b6a3edd4b1652cb9cc5aa6f";
 
     const ZENToken = await ethers.getContractFactory("ZENToken");
     const weth = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2";
@@ -18,13 +20,6 @@ describe("Burner", () => {
     await this.zen.deployed();
     this.xen = await ZENToken.deploy();
     await this.xen.deployed();
-    const Burner = await ethers.getContractFactory("Burner");
-    this.burner = await Burner.deploy(
-      unirouter,
-      this.zen.address,
-      this.xen.address
-    );
-    await this.burner.deployed();
 
     await this.xen.mint(owner.address, ethers.utils.parseEther("200"));
     await this.zen.mint(owner.address, ethers.utils.parseEther("200"));
@@ -60,36 +55,40 @@ describe("Burner", () => {
       { value: ethers.utils.parseEther("1") }
     );
 
-    // Create XEN/ZEN the pool 50/50
-    await this.router.addLiquidity(
+    const UniswapV2Factory = await ethers.getContractFactory(
+      UniswapV2FactoryArtifact.abi,
+      UniswapV2FactoryArtifact.bytecode
+    );
+    this.factory = UniswapV2Factory.attach(unifactory);
+
+    const startBlock = await ethers.provider.getBlockNumber();
+
+    const xenEthUNIv2Pool = await this.factory.getPair(
       this.xen.address,
+      this.weth.address
+    );
+    const zenXenUNIv2Pool = await this.factory.getPair(
       this.zen.address,
-      ethers.utils.parseEther("50"),
-      ethers.utils.parseEther("50"),
-      ethers.utils.parseEther("50"),
-      ethers.utils.parseEther("50"),
-      owner.address,
-      Date.now() + 100
+      this.xen.address
+    );
+    const zenEthUNIv2Pool = await this.factory.getPair(
+      this.zen.address,
+      this.weth.address
+    );
+
+    const Masterchef = await ethers.getContractFactory("MasterChef");
+    this.masterchef = await Masterchef.deploy(
+      this.zen.address,
+      this.xen.address,
+      unirouter,
+      20,
+      startBlock + 1000,
+      startBlock + 10000,
+      xenEthUNIv2Pool,
+      zenXenUNIv2Pool,
+      zenEthUNIv2Pool
     );
   });
 
-  it("should burn tokens correctly", async () => {
-    await this.zen.transfer(this.burner.address, ethers.utils.parseEther("1"));
-    const burnerBalance = await this.zen.balanceOf(this.burner.address);
-    expect(burnerBalance).to.eq(ethers.utils.parseEther("1"));
-
-    // Init Burn
-    await this.burner.burn();
-
-    // Should sell 50 ZEN to WETH and reward the caller with 10% of the rewards
-    const callerWethBalance = await this.weth.balanceOf(this.owner.address);
-    expect(callerWethBalance).to.eq(
-      ethers.utils.parseEther("0.000987158034397061")
-    );
-
-    const burnerBalanceAfterBurn = await this.zen.balanceOf(
-      this.burner.address
-    );
-    expect(burnerBalanceAfterBurn).to.eq(0);
-  });
+  it("should deploy", async () => {});
 });
