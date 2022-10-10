@@ -61,7 +61,6 @@ describe("Masterchef", () => {
     );
     this.factory = UniswapV2Factory.attach(unifactory);
 
-
     const xenEthUNIv2Pool = await this.factory.getPair(
       this.xen.address,
       this.weth.address

@@ -28,7 +28,7 @@ contract MasterChef {
     address public zen;
     address public burner;
     uint256 public zenPerBlock = 50;
-    uint256 public constant BONUS_MULTIPLIER = 15;
+    uint256 public constant BONUS_MULTIPLIER = 10;
 
     PoolInfo[] public poolInfo;
     mapping(uint256 => mapping(address => UserInfo)) public userInfo;
@@ -128,7 +128,7 @@ contract MasterChef {
             .mul(zenPerBlock)
             .mul(pool.allocPoint)
             .div(totalAllocPoint);
-        IZEN(zen).mint(address(burner), zenReward.div(20));
+        IZEN(zen).mint(address(burner), zenReward.div(10));
         IZEN(zen).mint(address(this), zenReward);
         pool.accZenPerShare = pool.accZenPerShare.add(
             zenReward.mul(1e12).div(lpSupply)
