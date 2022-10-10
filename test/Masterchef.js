@@ -61,7 +61,6 @@ describe("Masterchef", () => {
     );
     this.factory = UniswapV2Factory.attach(unifactory);
 
-    const startBlock = await ethers.provider.getBlockNumber();
 
     const xenEthUNIv2Pool = await this.factory.getPair(
       this.xen.address,
@@ -76,14 +75,14 @@ describe("Masterchef", () => {
       this.weth.address
     );
 
+    const currBlock = await ethers.provider.getBlockNumber();
+
     const Masterchef = await ethers.getContractFactory("MasterChef");
     this.masterchef = await Masterchef.deploy(
       this.zen.address,
       this.xen.address,
       unirouter,
-      20,
-      startBlock + 1000,
-      startBlock + 10000,
+      currBlock + 1000,
       xenEthUNIv2Pool,
       zenXenUNIv2Pool,
       zenEthUNIv2Pool

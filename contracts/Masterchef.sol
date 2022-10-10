@@ -27,14 +27,14 @@ contract MasterChef {
 
     address public zen;
     address public burner;
-    uint256 public bonusEndBlock;
-    uint256 public zenPerBlock;
-    uint256 public constant BONUS_MULTIPLIER = 10;
+    uint256 public zenPerBlock = 50;
+    uint256 public constant BONUS_MULTIPLIER = 15;
 
     PoolInfo[] public poolInfo;
     mapping(uint256 => mapping(address => UserInfo)) public userInfo;
     uint256 public totalAllocPoint = 0;
     uint256 public startBlock;
+    uint256 public bonusEndBlock = startBlock.add(28800);
 
     event Deposit(address indexed user, uint256 indexed pid, uint256 amount);
     event Withdraw(address indexed user, uint256 indexed pid, uint256 amount);
@@ -48,17 +48,13 @@ contract MasterChef {
         address _zen,
         address _xen,
         address _unirouter,
-        uint256 _zenPerBlock,
         uint256 _startBlock,
-        uint256 _bonusEndBlock,
         address _xenEthUNIv2Pool,
         address _zenXenUNIv2Pool,
         address _zenEthUNIv2Pool
     ) public {
         zen = _zen;
         burner = address(new Burner(_unirouter, _zen, _xen));
-        zenPerBlock = _zenPerBlock;
-        bonusEndBlock = _bonusEndBlock;
         startBlock = _startBlock;
 
         _add(25, _xenEthUNIv2Pool, true);
