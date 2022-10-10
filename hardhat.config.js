@@ -1,9 +1,14 @@
 require("dotenv").config();
+require("@nomiclabs/hardhat-waffle");
 
 module.exports = {
   defaultNetwork: "hardhat",
   networks: {
-    hardhat: {},
+    hardhat: {
+      forking: {
+        url: process.env.RPC_URL,
+      },
+    },
   },
   etherscan: {
     apiKey: process.env.ETHERSCAN_API,

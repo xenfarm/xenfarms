@@ -17,10 +17,16 @@
     "test": "hardhat test"
   },
   "devDependencies": {
-    "dotenv": "16.0.3",
-    "hardhat": "2.11.2",
-    "prettier": "2.7.1",
+    "@nomiclabs/hardhat-ethers": "2.1.1",
+    "@nomiclabs/hardhat-waffle": "2.0.3",
     "@openzeppelin/contracts": "3.4.2",
+    "chai": "4.3.6",
+    "dotenv": "16.0.3",
+    "ethereum-waffle": "3.4.4",
+    "ethers": "5.7.1",
+    "hardhat": "2.11.2",
+    "@uniswap/v2-periphery": "1.1.0-beta.0",
+    "prettier": "2.7.1",
     "prettier-plugin-solidity": "1.0.0-beta.24"
   }
 }

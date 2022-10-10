@@ -18,7 +18,7 @@ contract Burner {
     address unirouter;
     address[] public wethToZenRoute;
     address[] public zenToWethRoute;
-    address[] public xenToWethRoute;
+    address[] public wethToXenRoute;
 
     constructor(
         address _unirouter,
@@ -28,6 +28,7 @@ contract Burner {
         zen = _zen;
         xen = _xen;
         unirouter = _unirouter;
+
         _giveAllowances();
 
         wethToZenRoute = new address[](2);
@@ -38,9 +39,9 @@ contract Burner {
         zenToWethRoute[0] = zen;
         zenToWethRoute[1] = WETH;
 
-        xenToWethRoute = new address[](2);
-        xenToWethRoute[0] = xen;
-        xenToWethRoute[1] = WETH;
+        wethToXenRoute = new address[](2);
+        wethToXenRoute[0] = WETH;
+        wethToXenRoute[1] = xen;
     }
 
     function burn() public {
@@ -57,34 +58,35 @@ contract Burner {
         // 10% is rewarded to the function caller
         // 45% is used to buy and burn zen
         // 45% is used to buy and burn xen
+        uint256 wethBalance = IERC20(WETH).balanceOf(address(this));
+        uint256 callerReward = wethBalance.div(10);
 
-        IERC20(WETH).transferFrom(
-            address(this),
-            msg.sender,
-            IERC20(WETH).balanceOf(address(this)).div(10)
-        );
+        IERC20(WETH).transferFrom(address(this), msg.sender, callerReward);
+
+        uint256 buyBalance = wethBalance.sub(callerReward);
 
         IUniswapRouterETH(unirouter).swapExactTokensForTokens(
-            IERC20(WETH).balanceOf(address(this)).div(50),
+            buyBalance.div(2),
             0,
             wethToZenRoute,
             address(this),
             now
         );
+
         IUniswapRouterETH(unirouter).swapExactTokensForTokens(
-            IERC20(WETH).balanceOf(address(this)),
+            buyBalance.div(2),
             0,
-            xenToWethRoute,
+            wethToXenRoute,
             address(this),
             now
         );
+
         ERC20Burnable(zen).burn(IERC20(zen).balanceOf(address(this)));
         ERC20Burnable(xen).burn(IERC20(xen).balanceOf(address(this)));
     }
 
     function _giveAllowances() internal {
         IERC20(zen).approve(address(unirouter), uint256(-1));
-        IERC20(xen).approve(address(unirouter), uint256(-1));
         IERC20(WETH).approve(address(unirouter), uint256(-1));
     }
 }
